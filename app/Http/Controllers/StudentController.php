@@ -138,10 +138,10 @@ class StudentController extends Controller
         return view('students.index', compact('student'))->with('i', (request()->input('page', 1) - 1) * 5);
     }
 
-    public function nilai($id)
+    public function detail($id)
     {
         $student = Student::find($id);
-        return view('students.nilai', ['student'=>$student]);
+        return view('students.detail', ['student'=>$student]);
     }
 
     public function report($id)
