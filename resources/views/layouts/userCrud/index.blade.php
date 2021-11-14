@@ -14,32 +14,44 @@
                     </div>
                     @endif
 
-                    <a href="/userCrud/create" class="btn btn-primary">Add Data</a> 
-                    <br><br>
+                    <a href="/users/create" class="btn btn-primary">Add Data</a> <br><br>
+                    <form action="{{ route('search_user') }}" method="post" >
+                        <div class="form-group">
+                            <input type="text" name="search" class="form-control w-75 d-inline" id="search" placeholder="User Name">
+                            @method('GET')
+                            <button type="submit" class="btn btn-primary">Search</button>
+                        </div>
+                    </form>
+                    
+                    @if ($message = Session::get('success'))
+                    <div class="alert alert-success">
+                        <p>{{ $message }}</p>
+                    </div>
+                    @endif
 
                     <table class="table table-responsive table-striped">
                         <thead>
                             <tr>
-                                <th>username</th>
-                                <th>name</th>
-                                <th>email</th>
-                                <th>Action</th>
+                                <th>Usernama</th>
+                                <th>Name</th>
+                                <th>E-mail</th>
+                                <th>Action</th> 
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($User as $s)
+                            @foreach($user as $u)
                             <tr>
-                                <td>{{$s->username}}</td>
-                                <td>{{$s->name}}</td>
-                                <td>{{$s->email}}</td>
+                                <td>{{ $u->username }}</td>
+                                <td>{{ $u->name }}</td>
+                                <td>{{ $u->email }}</td>
+                                <td>{{ $u->role }}</td>
                                 <td>
-                                    <form action="/userCrud/{{$s->id}}" method="post">
-                                        <a href="/userCrud/{{$s->id}}/edit" class="btn btn-warning">Edit</a>
-                                        <a href="/userCrud/{{$s->id}}" class="btn btn-warning">View</a>
+                                    <form action="/users/{{$u->id}}" method="post">
+                                        <a href="/users/{{$u->id}}/edit" class="btn btn-warning">Edit</a>
+                                        <a href="/users/{{$u->id}}" class="btn btn-info">View</a>
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" name="delete" class="btn btn-danger">Delete</button>
-                                        
                                     </form>
                                 </td>
                             </tr>

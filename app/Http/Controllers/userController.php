@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\Gate;
 
-class userController extends Controller
+class UserController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,8 +15,8 @@ class userController extends Controller
      */
     public function index()
     {
-        $users_crud = User::all();
-        return view('userCrud.index',['User'=>$users_crud]);
+        $users = User::all();
+        return view('users.index',['user'=>$users]);
     }
 
     /**
@@ -25,7 +26,7 @@ class userController extends Controller
      */
     public function create()
     {
-        return view('userCrud.create');
+        return view('users.create');
     }
 
     /**
@@ -40,7 +41,7 @@ class userController extends Controller
         User::create($request->all());
 
         // if true, redirect to index
-        return redirect()->route('userCrud.index')
+        return redirect()->route('users.index')
         ->with('success', 'Add data success!');
     }
 
@@ -52,8 +53,8 @@ class userController extends Controller
      */
     public function show($id)
     {
-        $users_crud = User::find($id);
-        return view('userCrud.userview',['User'=>$users_crud]);
+        $user = User::find($id);
+        return view('users.view', ['user' => $user]);
     }
 
     /**
@@ -64,8 +65,8 @@ class userController extends Controller
      */
     public function edit($id)
     {
-        $users_crud = User::find($id);
-        return view('userCrud.useredit',['User'=>$users_crud]);
+        $user = User::find($id);
+        return view('users.edit',['user'=>$user]);
     }
 
     /**
@@ -77,13 +78,13 @@ class userController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $users_crud = User::find($id);
-        $users_crud->username = $request->username;
-        $users_crud->name = $request->name;
-        $users_crud->email = $request->email;
-        $users_crud->password = $request->password;
-        $users_crud->save();
-        return redirect()->route('userCrud.index');
+        $user = User::find($id);
+        $user->username = $request->username;
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->password = $request->password;
+        $user->save();
+        return redirect()->route('users.index');
     }
 
     /**
@@ -94,8 +95,24 @@ class userController extends Controller
      */
     public function destroy($id)
     {
-        $users_crud = User::find($id);
-        $users_crud->delete();
-        return redirect()->route('userCrud.index');
+        $user = User::find($id);
+        $user->delete();
+        return redirect()->route('users.index');
+    }
+
+    public function search(Request $request)
+    {
+        $keyword = $request->search;
+        $user = User::where('name', 'like', "%" . $keyword . "%")->paginate(5);
+        return view('users.index', compact('user'))->with('i', (request()->input('page', 1) - 1) * 5);
+    }
+
+    public function __construct()
+    {
+        //$this->middleware('auth');
+        $this->middleware(function($request, $next){
+        if(Gate::allows('manage-users')) return $next($request);
+            abort(403, 'Anda tidak memiliki cukup hak akses');
+        });
     }
 }
